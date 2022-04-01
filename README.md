@@ -39,7 +39,7 @@ To create an executable file, use the following command:
 
 If there aren't error, the executable file will be available into the .\dist folder.
 
-Try to eexecute:
+Try to execute:
 
 > .\dist\simplecpm.exe
 # Useful links
