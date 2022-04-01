@@ -27,7 +27,7 @@ Then execute from the commandline:
 
 > python simplecpm.py
 
-If it's printed as output the Critical Path node's list and its length, everithing has gone well.
+If it's printed as output the Critical Path node's list and its length, everything has gone well.
 To create an executable file, use the following command:
 
 > pyinstaller -F simplecpm.py
