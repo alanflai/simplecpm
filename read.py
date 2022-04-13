@@ -8,7 +8,7 @@ from criticalpath import Node
 
 
 FILE_REFERENCE = "plan.xlsx"
-p = Node('project')
+graph = Node('project')
 
 # Set logging level
 logging.basicConfig(level=logging.INFO)
@@ -87,8 +87,7 @@ pert_node = []
 for i in range(len(nodes_id)):
     node_id = nodes_id[i]
     node_duration = nodes_duration[i]
-    # node_duration = nodes_duration[get_nodes_ref(nodes_id,node_id)]
-    pert_node.append(p.add(Node(node_id, duration=node_duration, lag=0)))
+    pert_node.append(graph.add(Node(node_id, duration=node_duration, lag=0)))
 
 # PERT links 
 for link in links_list:
@@ -102,7 +101,7 @@ for link in links_list:
     p.link(from_obj, to_obj)
 
 # Evaluate critical path
-p.update_all()
-cpm = p.get_critical_path()
+graph.update_all()
+cpm = graph.get_critical_path()
 print("critical path:", cpm)
 print("Durata: %2d" % p.duration)

@@ -1,0 +1,31 @@
+=====================================================================
+        Registro proposte test
+=====================================================================
+
+> T1: File piano in Excel o altro formato non presente - gestione eccezione
+Input: nome di un file inesistente con estensione excel ed uno in altro formato
+Output: messaggio di errore, file non presente
+
+> T2: File piano non in formato excel - gestione eccezine
+Input: nome di un file esistente ma non in formato excel
+Output: messaggio di errore, file format non supportato
+
+> T3: File piano esistente in excel senza sheet PERT - gestione eccezione
+Input: nome di un file piano esistente in formato excel senza worksheet PERT
+Output: messaggio di errore, foglio PERT non presente
+
+> T4: File piano esistente in excel con colonne sheet PERT errati - gestione eccezione
+Input: nome di un file piano esistente in formato excel scon worksheet PERT ma con campi diversi dal formato atteso 
+       - colonne nulle
+       - numero colonne superiroe a quelle del formato
+       - numero colonne uguali al formato ma con valori di colonna diversi dal formato
+Output: messaggio di errore, foglio PERT con formato non supportato
+
+> T5: File piano esistente in excel con sheet PERT formato corretto, con righe vuote nel corpo della tabella - gestione eccezione
+Input: nome di un file piano esistente in formato excel con worksheet PERT compliant ma con righe vuote nel corpo della tabella
+       - almeno un intervallo di righe vuote tra la prima riga e l'ultima riga della tabella
+Output: messaggio di errore, foglio PERT con attività incomplete
+
+> T6: File piano ok, id attività non univoche - gestione eccezione
+Input: file contenente degli ID di attività ripetuti 
+Output: messaggio di errore, foglio PERT attività replicate

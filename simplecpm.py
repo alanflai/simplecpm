@@ -4,101 +4,94 @@
 # Credits:
 # criticalpath python package (https://pypi.org/project/critical-path/)
 
+import logging
+from numpy import NaN
+import pandas as pd
 from criticalpath import Node
-p = Node('project')
-z1 = p.add(Node('0.1', duration=23))
-z2 = p.add(Node('0.2', duration=1, lag=0))
-z3 = p.add(Node('0.3', duration=1, lag=0))
-z4 = p.add(Node('0.4', duration=1, lag=0))
-z5 = p.add(Node('0.5', duration=1, lag=0))
-z6 = p.add(Node('0.6', duration=1, lag=0))
-z7 = p.add(Node('0.7', duration=1, lag=0))
-
-fase2 =  p.add(Node('PH2', duration=35, lag=0))
-fase3 =  p.add(Node('PH3', duration=16, lag=0))
-fine = p.add(Node('End', duration=0, lag=0))
-
-u1 = p.add(Node('1.1', duration=3, lag=0))
-u2 = p.add(Node('1.2', duration=1, lag=0))
-u3 = p.add(Node('1.3', duration=12, lag=0))
-u4 = p.add(Node('1.4', duration=12, lag=0))
-u5 = p.add(Node('1.5', duration=16, lag=0))
-u6 = p.add(Node('1.6', duration=15, lag=0))
-u7 = p.add(Node('1.7', duration=9, lag=0))
-u8 = p.add(Node('1.8', duration=2, lag=0))
-u9 = p.add(Node('1.9', duration=2, lag=0))
-u10 = p.add(Node('1.10', duration=15, lag=0))
-u11 = p.add(Node('1.11', duration=10, lag=0))
-u12 = p.add(Node('1.12', duration=25, lag=0))
-u13 = p.add(Node('1.13', duration=16, lag=0))
-u14 = p.add(Node('1.14', duration=16, lag=0))
-u15 = p.add(Node('1.15', duration=11, lag=0))
-u16 = p.add(Node('1.16', duration=17, lag=0))
-u17 = p.add(Node('1.17', duration=17, lag=0))
-u18 = p.add(Node('1.18', duration=4, lag=0))
-u19 = p.add(Node('1.19', duration=10, lag=0))
-u20 = p.add(Node('1.20', duration=16, lag=0))
-u21 = p.add(Node('1.21', duration=16, lag=0))
-u22 = p.add(Node('1.22', duration=6, lag=0))
-u23 = p.add(Node('1.23', duration=15, lag=0))
-u24 = p.add(Node('1.24', duration=0, lag=0))
-
-p.link(z1, z2)
-p.link(z2, z3)
-p.link(z2, u1)
-p.link(z2, u2)
-
-p.link(z3, z4)
-p.link(z3, u3)
-p.link(z3, u6)
-p.link(z2, u13)
-p.link(z2, u14)
-
-p.link(z4, z5)
-p.link(z5, z6)
-p.link(z6, z7)
-p.link(z7, fine)
-
-p.link(u1, u24)
-p.link(u2, u4)
-p.link(u3, u4)
-
-p.link(u4, u5)
-p.link(u5, u8)
-p.link(u6, u7)
-p.link(u7, u9)
-p.link(u6, u7)
-p.link(u8, u9)
-p.link(u9, u10)
-p.link(u10, u11)
-p.link(u10, u12)
-
-p.link(u14, u15)
-p.link(u15, u16)
-p.link(u16, u20)
-p.link(u15, u17)
-p.link(u11, u16)
-p.link(u11, u17)
-
-p.link(u17, u18)
-p.link(u18, u21)
-p.link(u21, fine)
-p.link(u17, u20)
-
-p.link(u11, u23)
-p.link(u12, u23)
-p.link(u10, u22)
-p.link(u16, u19)
-p.link(u19, u24)
-p.link(u22, u23)
-p.link(u23, u24)
-
-p.link(u24, fase2)
-p.link(fase2, fase3)
-p.link(fase3, fine)
 
 
-p.update_all()
-cpm = p.get_critical_path()
+FILE_REFERENCE = "plan.xlsx"
+graph = Node('project')
+
+# Set logging level
+logging.basicConfig(level=logging.INFO)
+
+# get_row
+# Parameters: 
+# - tuple (row, column)
+# Return the row values
+def get_row(values):
+    if type(values) is tuple:
+        return values[0]
+    else:
+        return NaN
+
+def get_col(values):
+    if type(values) is tuple:
+        return values[1]
+    else:
+        return NaN
+
+# get_nodes_ref
+# Parameters:
+# - list nodes_list
+# - string node_id
+# Return node_id string index inside nodes_list list
+def get_nodes_ref(nodes_list, node_id):
+    try:
+        return nodes_list.index(node_id)
+    except:
+        logging.info("Error index %s" % node_id)
+        return -1
+
+# Excel's Workbook read
+try:
+    wb = pd.read_excel(FILE_REFERENCE,sheet_name="PERT")
+except FileNotFoundError:
+    logging.info("Error, input excel file doesn't exist!!")
+except BaseException:
+    logging.exception("Generic Error!")
+
+# Get Excel's DataFrame rows and columns
+row = get_row(wb.shape)
+col = get_col(wb.shape)
+logging.info("PERT excel's sheet Rows and columns: %s - %s" %(row,col))
+
+# Network links list
+links_list = []
+for i in range(1,row):
+    from_nodes_str = wb['Depend.'][i]
+    to_node = wb['Id'][i]
+    if isinstance(from_nodes_str,str):
+        # print("%s) %s - %s" % (i, from_nodes_str, to_node ))
+        for val in from_nodes_str.split(','):
+            # logging.info(" from node: %s" % val)
+            links_list.append([val.strip(),to_node])
+
+nodes_id = wb['Id'].tolist()
+nodes_duration = wb['Duration'].tolist()
+
+# PERT nodes creation
+pert_node = []
+
+for i in range(len(nodes_id)):
+    node_id = nodes_id[i]
+    node_duration = nodes_duration[i]
+    pert_node.append(graph.add(Node(node_id, duration=node_duration, lag=0)))
+
+# PERT links 
+for link in links_list:
+    from_index = get_nodes_ref(nodes_id,link[0])
+    to_index= get_nodes_ref(nodes_id,link[1])
+
+    print("Node start: %s, Node end: %s - start id: %s, end_id: %s" % (link[0], link[1],from_index, to_index))
+
+    from_obj = pert_node[from_index]
+    to_obj = pert_node[to_index]
+    p.link(from_obj, to_obj)
+
+# Evaluate critical path
+graph.update_all()
+cpm = graph.get_critical_path()
 print("critical path:", cpm)
 print("Durata: %2d" % p.duration)
