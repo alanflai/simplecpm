@@ -10,7 +10,7 @@ import pandas as pd
 from criticalpath import Node
 
 
-FILE_REFERENCE = "plan.xlsx"
+FILE_REFERENCE = "plan0.xlsx"
 graph = Node('project')
 
 # Set logging level
@@ -39,7 +39,8 @@ def get_col(values):
 # Return node_id string index inside nodes_list list
 def get_nodes_ref(nodes_list, node_id):
     try:
-        return nodes_list.index(node_id)
+        val = nodes_list.index(node_id)
+        return val
     except:
         logging.info("Error index %s" % node_id)
         return -1
@@ -62,15 +63,16 @@ logging.info("PERT excel's sheet Rows and columns: %s - %s" %(row,col))
 # Network links list
 links_list = []
 for i in range(1,row):
-    from_nodes_str = wb['Depend.'][i]
-    to_node = wb['Id'][i]
+    from_nodes_str = str(wb['Depend.'][i])
+    to_node = str(wb['Id'][i])
     if isinstance(from_nodes_str,str):
         # print("%s) %s - %s" % (i, from_nodes_str, to_node ))
         for val in from_nodes_str.split(','):
             # logging.info(" from node: %s" % val)
             links_list.append([val.strip(),to_node])
+           
 
-nodes_id = wb['Id'].tolist()
+nodes_id =[str(x) for x in wb['Id'].tolist()] 
 nodes_duration = wb['Duration'].tolist()
 
 # PERT nodes creation
@@ -86,7 +88,7 @@ for link in links_list:
     from_index = get_nodes_ref(nodes_id,link[0])
     to_index= get_nodes_ref(nodes_id,link[1])
 
-    print("Node start: %s, Node end: %s - start id: %s, end_id: %s" % (link[0], link[1],from_index, to_index))
+    # print("Node start: %s, Node end: %s - start id: %s, end_id: %s" % (link[0], link[1],from_index, to_index))
 
     from_obj = pert_node[from_index]
     to_obj = pert_node[to_index]
