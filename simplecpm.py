@@ -49,8 +49,10 @@ try:
     wb = pd.read_excel(FILE_REFERENCE,sheet_name="PERT")
 except FileNotFoundError:
     logging.info("Error, input excel file doesn't exist!!")
+    exit(-1)
 except BaseException:
     logging.exception("Generic Error!")
+    exit(-1)
 
 # Get Excel's DataFrame rows and columns
 row = get_row(wb.shape)
@@ -88,10 +90,10 @@ for link in links_list:
 
     from_obj = pert_node[from_index]
     to_obj = pert_node[to_index]
-    p.link(from_obj, to_obj)
+    graph.link(from_obj, to_obj)
 
 # Evaluate critical path
 graph.update_all()
 cpm = graph.get_critical_path()
 print("critical path:", cpm)
-print("Durata: %2d" % p.duration)
+print("Durata: %2d" % graph.duration)
